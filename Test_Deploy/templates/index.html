@@ -1,0 +1,195 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Image Classifier</title>
+    <link rel="icon" href="brain.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+    <link href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">     
+
+    
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#video_container">Age Detection</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#tm">Traditional ML</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#dl">Deep Learning</a>
+              </li>
+              <div class="cont">
+              <li class="nav-item">
+                  <a class="navbar-brand" href="#foot">Contact Me</a>
+              </li>
+            </div>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      
+    <div class="container">
+        <div style="margin-top:2em">
+           <center><h2>Age Detection Live feed from webcam</h2></center> 
+        </div>    
+        <div class="content" style="margin-top:2em">
+            
+
+           
+                <div id="video_container" >
+                    <img src="{{ url_for('video_feed') }}" width="100%">
+                </div>
+           
+
+            
+        </div>
+    </div>
+    <div class="tml" id="tm">
+        <h2>Traditional Machine Learning</h2>
+
+        <br>
+        <h3>1. Feature Extraction</h3>
+
+        <p style="margin-top: 50px;"> Here is a summary of the accuracy scores for all the different approaches.</p>
+            <br>
+        <img src="https://miro.medium.com/max/1346/1*QD7n-7lcs2QGdF4gVVKoig.png" alt="">
+    <p style="margin-top: 50px;">In order to extract features from the facial images for my project, I decided to
+         apply a few different filters on some images from my dataset and visually try to spot any significant differences between them.</p>
+         <br>
+         <img src="https://miro.medium.com/max/2028/1*lpv2o0GGqMO1zlGp_-q23Q.png" alt="" height="500px" width="500px">
+         <p style="margin-top: 50px;">From the plot above, I was able to conclude that Canny Edges may be the most useful filter for feature extraction in this case — 
+            as we move from younger to older faces, the density of Canny Edges in the images seem to increase.</p>
+            <br>
+        <p style="margin: 50px,50px;">Now that the filter of choice was identified, the next step was to convert the filtered images into scalars so as to be able to feed them into a machine learning classifier. To do this, I decided to breakdown each 200x200 pixels image into sections of 10x10 pixels each, as illustrated below. For each of the 400 resulting sections, I then calculated the mean and standard deviation of the pixel values. This resulted in 800 unique scalar values for each image,
+             which I then tabulated into a dataframe to be used as features in a machine learning classifier.</p>
+             <br>
+             <img style="margin: 50px,50px;" src="https://miro.medium.com/max/405/1*WEmHiXQR0GYMl2IoGcc06w.png" alt="" height="500px" width="500px">
+
+             <h3>2. Classification Modelling</h3>
+             <br>
+             <p style="margin: 50px,50px;">The above feature extraction process was repeated for all images in both train and test datasets. These features were then used in two different classifier algorithms, sklearn.ensemble.RandomForestClassifier and sklearn.svm.SVC. Both the models were optimized for accuracy by passing multiple combinations of hyperparameters through sklearn.model_selection.GridSearchCV. 
+                The table below shows the summary of the obtained results.</p>
+                <br>
+                <img style="margin-bottom: 50px;" src="https://miro.medium.com/max/502/1*0AEQbId1MROE7wQuopBbcQ.png" alt="" >
+        </div>
+      <div class="tml" id="dl">    
+         <h1 style="margin: 50px,50px;">Deep Learning</h1>   
+         <br>
+         <p>Convolutional Neural Network (CNN) model that performed with reasonable accuracy on the given data and with the given number of total parameters. The idea was to get an initial benchmark on the model’s performance, and then incrementally try different techniques to see whether they improve the performance from that point or not. After some back-and-forth experimentation with the CNN architecture, 
+             I decided to fix the following architecture to begin with.</p>    
+             <br>
+             <img style="margin:50px;" src="https://miro.medium.com/max/379/1*dafPry6IbXRqtsxt8kmzsQ.png" alt="">
+
+         <br>
+         <p>The model performance was not that great, but was a good starting point with only slight over-fitting. The normalized confusion matrix also showed that, similar to the traditional ML approach above, even though the accuracy values are somewhat high for the younger age-ranges (of 1–2, 3–9, 10–20 and 21–25) and for the older age ranges (of 66–116), there is a presence of significant misclassification for the middle age-ranges of 26–65. This may be attributed to the fact that people’s facial appearances (in general) do not change as much during these middle age ranges as they do during the younger and older age ranges. 
+             In any case, the next step in this process was to improve the model’s performance using a few different techniques.</p>   
+             <br>
+             <img style="margin: 50px;" src="https://miro.medium.com/max/497/1*ZVFnd7ycdf8KBOKNgNbCIA.png" alt=""> 
+             <p>Normalized confusion matrix for age predictions from initial CNN model using grayscale images
+            </p>
+            <h3 style="margin: 50px;">Improving Model</h3>
+            <p>The following two strategies were tried first to improve the model’s performance:</p>
+            <br>
+            <p>1. Using RGB coloured images instead of grayscale images: </p>
+            <br>
+            <p>The rationale behind this was that maybe adding the colour data in the images may bring out some 
+                features within the CNN model which may enhance the overall performance of the model.</p>
+            <p>2. Augmenting the images in training dataset: </p>
+            <br>
+            <p>The rationale behind this was that increasing the amount of data for the model to train with would help to increase the variance in the dataset. This may improve the model’s accuracy whilst decreasing the possibility of over-fit. For every 1 original image, 9 other augmented images were created by flipping the image laterally and rotating them by various degrees, as shown in the illustration below. So, the augmented training
+                 dataset had a total of 234,400 images (as compared to 23,440 images in the original training dataset).</p>
+                 <br>
+                <img src="https://miro.medium.com/max/405/1*D1Lb8X6wUnfleV4UGJ6jfQ.png" style="margin-top: 50px;" alt="">
+                <p>Image data augmentation: Creating 9 augmented images from 1 original image.
+                </p>
+                <br>
+                <p>The same CNN model architecture as above was used to fit the model on RGB coloured images and the augmented training dataset, 
+                    and the following results were observed:</p>
+                    <br>
+                    <img src="https://miro.medium.com/max/405/1*IVpEKb6wWYYiQnP8k3LGfw.png" style="margin: 50px;" alt="" >
+                <h3> <p style="margin: 50px;">The accuracy scores in the table above highlighted two key findings:</p></h3>
+                 <p>1.Using RGB coloured images instead of grayscale images may not improve the model performance and may lead to more over-fit.</p>   
+                 <p>2. Augmenting the images in the training dataset helped to improve the model’s accuracy whilst decreasing the over-fit (even after training for 60 epochs).</p>
+
+             <h2>Re-thinking the Age-ranges</h2>
+             <p>Looking at the evaluations of all the CNN models built above, it was clear that the accuracy scores were not very high (~45% at best). This is, in fact, rather expected, since guessing someone’s age is purely based on appearance, and thus very subjective. Even we as humans struggle with this problem all the time. There are a lot of factors that play a role in how someone looks at their age, such as genetics, 
+                 living conditions and lifestyle choices (healthy diet, amount of exercise, smoking habit, etc.).</p>
+             <br>
+             <p>
+                As we have seen above, even with data augmentation, the accuracy score did not improve significantly. The primary issue was still the fact that there was a presence of significant misclassification for the middle age-ranges of 26–65. So, to avoid this problem, I decided to re-distribute the age-ranges into classes again. This time, however, instead of just looking at the available number of images per age-range, I also decided to take into account the human intuition factor (likely age groups that we, as humans, would classify a person into) 
+                and the accuracy scores for the individual classes shown in the confusion matrix above.
+             </p>    
+             <br>
+             <p>The age-ranges were re-distributed into the following 7 classes.</p>
+             <br>
+             <img style="margin-bottom: 50px;" src="https://miro.medium.com/max/255/1*7R2i31HUkx2zafnJQwyzzQ.png" alt="">
+             <p>
+                The same CNN model architecture as above was used again to fit the model on the training dataset, and the following results were observed:
+
+             </p>
+             <br>
+             <img src="https://miro.medium.com/max/405/1*cqrE3orYUIrKq3OIDEwDXg.png" alt="">
+             <br>
+             <p>The accuracy scores showed a similar degree of over-fit as the first CNN model fit on grayscale images (which is expected), but the accuracy scores themselves were significantly higher. The normalized confusion matrix below also showed that we may have addressed the problem of misclassification for the middle age-ranges of 26–65 (at least to some extent if not completely).
+            </p>
+            <br>
+            <img src="https://miro.medium.com/max/496/1*AQ4djYRqTsW0d7fQF5aV4g.png" alt="">
+            <p>Normalized confusion matrix for age predictions from initial CNN model using grayscale images and re-distributed classes of age-ranges. </p>
+            <h2>Optimizing the CNN Architecture</h2>
+            <p>Now that I had explored a few techniques of manipulating the dataset to improve the preformance of the CNN models, I decided to optimize the CNN model architecture itself to enhance the overall performance. The idea here was to design multiple models of different architectures and compare their performances in terms of loss and accuracy values. I decided to use tf.keras.callbacks.TensorBoard as a callback while training the multiple CNN models so as to be able to compare their performances in interactive (and definitely more intuitive) plots. I strongly suggest watching this series of videos to gain a better understanding on how to optimize neural networks using TensorBoard.
+            </p>
+            <p>Based on the optimization results, after comparing 18 different CNN models with varying architectures of different numbers of Conv2D and Dense layers, the final CNN architecture that was chosen is as shown below.</p>
+            <br>
+            <img src="https://miro.medium.com/max/379/1*4tJXXlymFit88HlrsLbU5g.png" style="margin: 50px;" alt="">
+
+            <h2>Building the Final Model</h2>
+            <p>So, after understanding the effects of all of the above techniques on the model performance, the final CNN model could now be defined and trained:</p>
+            <br>
+            <p>1. with grayscale images instead of RGB coloured images.</p>
+            <p>2. with augmented training dataset (234,400 images) instead of original training dataset (23,440 images).</p>
+            <p>3. for 60 epochs.</p>
+            <p>4. for re-distributed classes of age-ranges.</p>
+            <p>5. with an optimized architecture.</p>
+            <br>
+            <p>I decided to use tf.keras.callbacks.ModelCheckpoint as a callback while training the final CNN model so as to be able to save the model as it continues training and improving in performance over 60 epochs. The model peaked in performance at epoch 54 of 60, with loss and accuracy values as follows.</p>
+            <img src="https://miro.medium.com/max/1763/1*uxHOlA-VbW1KsSkAcpq9xw.png" style="margin: 50px;" alt="">
+            <p>The accuracy scores improved significantly, although with a slight degree of over-fit, which may still be acceptable. The plot below shows the changes in loss and accuracy scores as the CNN model trained over 60 epochs. The normalized confusion matrix below also shows a significant reduction in the misclassification for the middle age-ranges of 26–65.
+            </p>
+            <img src="https://miro.medium.com/max/1763/1*kSQ6Xa_IYVXqhF_c3VK0cA.png" style="margin: 50px;" alt="">
+            <p>Plot showing changes in loss and accuracy values over epochs with peak performance at 54th of 60 epochs.</p>
+            <img src="https://miro.medium.com/max/496/1*Ctk3Pdcar1vTJHW5TolM3g.png" style="margin: 50px;">
+            <p>Normalized confusion matrix for age predictions from final CNN model using grayscale images</p>
+    </div>
+</body>
+<div class="footer-basic" id="foot">
+    <footer>
+        <div class="social"><a href="https://www.instagram.com/" target="_blank"><i class="icon ion-social-instagram"></i></a><a href="https://github.com/"><i class="fa fa-github" style="font-size:36px"></i></a><a href="https://twitter.com/"><i class="icon ion-social-twitter"></i></a><a href="https://www.facebook.com/"><i class="icon ion-social-facebook"></i></a></div>
+        <ul class="list-inline">
+            <li class="list-inline-item"><a href="#video_container">Webcam</a></li>
+            <li class="list-inline-item"><a href="#dl">Deep Learning</a></li>
+            <li class="list-inline-item"><a href="#tm">ML</a></li>
+            <li class="list-inline-item"><a href="#"></a>NISCHAY</li>
+            <li class="list-inline-item"><a href="#">21813001</a></li>
+        </ul>
+        <p class="copyright">copyright 2021</p>
+    </footer>
+</div>
+
+
+
+</html>
